@@ -5,7 +5,7 @@ import {thunk} from 'redux-thunk';
 
 import rootReducer from './store/reducers/rootReducer'; // Import your root reducer
 import { setToken } from './store/actions/sessionActions';
-import { fetchUser } from './store/actions/userActions';
+import { getProfile } from './store/actions/userActions';
 
 import Spinner from './components/spinner/spinner';
 import LeftSection from './containers/leftSection/leftSection';
@@ -24,21 +24,36 @@ class App extends Component {
 
   componentDidMount() {
     const token = Login.getToken();
+    //const { setToken, getProfile, fetchUserProfile } = this.props; // Destructure from props
+      console.log('Props:', this.props);
+  
     if (!token) {
       Login.logInWithSpotify();
     } else {
-      this.setState({ token: token });
-      // this.props.setToken(token);
-      // this.props.fetchUser();
+      this.setState({ token: token }, function () {
+        console.log("9090--9090",this.state.token);
+    });
+      console.log("Token:", token);
+
+      // Use this.props to call the action creators
+      setToken(token);
+      getProfile(token);
+      const tempToken =   localStorage.getItem('token');
+      console.log(tempToken)
+
     }
   }
+  
+  
 
   render() {
+    console.log("---lololo",this.state.token)
     let webPlaybackSdkProps = {
       playerName: 'Spotify React Player',
       playerInitialVolume: 1.0,
       playerRefreshRateMs: 1000,
       playerAutoConnect: true,
+      token : this.state.token,
       onPlayerRequestAccessToken: () => this.state.token,
       onPlayerLoading: () => {},
       onPlayerWaitingForDevice: () => {
@@ -74,14 +89,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
   setToken: (token) => dispatch(setToken(token)),
-  fetchUser: () => dispatch(fetchUser()),
+  getProfile: (token) => dispatch(getProfile(token)),
 });
 
-// Remove default export
-// export default connect(mapStateToProps, mapDispatchToProps)(App);
-
-// Create Redux store with rootReducer and apply middleware
-const store = createStore(rootReducer, applyMiddleware(thunk));
+const store = createStore(rootReducer, applyMiddleware(thunk)); // Apply Redux Thunk middleware
 
 // Wrap App component with Provider and provide Redux store
 const AppWithStore = () => (
@@ -90,4 +101,5 @@ const AppWithStore = () => (
   </Provider>
 );
 
-export default AppWithStore;
+export default connect(mapStateToProps, mapDispatchToProps)(AppWithStore);
+

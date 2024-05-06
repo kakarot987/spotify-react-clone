@@ -15,7 +15,7 @@ import song from '../../containers/mainSection/images/song.png';
 class Modal extends Component {
   state = {};
 
-  componentWillMount() {
+  componentDidMount() {
     this.initialize();
   }
 

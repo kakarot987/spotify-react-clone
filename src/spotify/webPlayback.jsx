@@ -15,6 +15,8 @@ class WebPlayback extends Component {
     playerSelected: false
   };
 
+  
+
   async handleState(state) {
     if (state) {
       this.props.setStatus(state);
@@ -24,17 +26,22 @@ class WebPlayback extends Component {
     }
   }
 
-  waitForSpotify() {
-    return new Promise(resolve => {
+  waitForSpotify = () => {
+    return new Promise((resolve) => {
       if ('Spotify' in window) {
+        console.log("---inside if")
         resolve();
       } else {
+        console.log("---inside ifelse")
+
         window.onSpotifyWebPlaybackSDKReady = () => {
+          console.log("---hererer")
           resolve();
         };
       }
     });
   }
+  
 
   waitForDeviceToBeSelected() {
     return new Promise(resolve => {
@@ -115,24 +122,32 @@ class WebPlayback extends Component {
     });
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
+
+    console.log("----Inside Webplayback")
     // Notify the player is loading
     this.props.onPlayerLoading();
+    console.log("----Inside Webplayback 2ndt",    this.props.onPlayerRequestAccessToken()  )
 
     // Wait for Spotify to load player
-    await this.waitForSpotify();
+     this.waitForSpotify();
+    console.log("----Inside Webplayback 3rd")
 
     // Setup the instance and the callbacks
     await this.setupWebPlaybackEvents();
+    console.log("----Inside Webplayback 4rd")
 
     // Wait for device to be ready
     let device_data = await this.setupWaitingForDevice();
     this.props.onPlayerWaitingForDevice(device_data);
+    console.log("----Device data",device_data)
 
     // Wait for device to be selected
     await this.waitForDeviceToBeSelected();
     this.props.onPlayerDeviceSelected();
   }
+
+  
 
   render() {
     return <Fragment>{this.props.children}</Fragment>;
